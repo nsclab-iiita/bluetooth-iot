@@ -1,0 +1,9 @@
+.devicesscan{
+  width: 80%;
+  margin: 50px auto;
+  display: block;
+}
+
+.devicescan_child h4{
+  margin-bottom: 20px;
+}

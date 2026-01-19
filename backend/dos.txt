@@ -1,0 +1,2 @@
+[+] Sending packet to 7C:B0:73:FE:D3:B2. Packet size: 600.
+[+] Sending packet to 7C:B0:73:FE:D3:B2. Packet size: 600.

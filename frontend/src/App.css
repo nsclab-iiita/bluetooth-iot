@@ -1,0 +1,13 @@
+body{
+    margin: 0;
+}
+
+.modes{
+    width: 80%;
+    margin: 50px auto;
+    display: block;
+}    
+
+.modes input , .modes button{
+    margin-left: 10px;
+}

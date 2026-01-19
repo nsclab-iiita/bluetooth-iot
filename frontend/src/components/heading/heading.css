@@ -1,0 +1,45 @@
+.heading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vm;
+    padding: 10px;
+    background-color: #F0F8FF
+}
+
+.headtext{
+    margin-left: 30px;
+    margin-right: 30px;
+    text-align: center;
+}
+
+.head1{
+    color: #00308F;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 0 0 10px 0;
+}
+
+.head2,.head3{
+    font-size: 16px;
+    margin: 0 0 10px 0;
+}
+
+.head4{
+    background-color: #143474;
+    color: white;
+    font-size: 20px;
+    font-weight : bold;
+    padding : 10px;
+    margin : 0;
+    text-align: center;
+}
+
+.iiitalogo{
+    height : 125px;
+    width : 125px;
+    background: white;
+    border-radius: 100%;
+
+}
+
