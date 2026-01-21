@@ -23,6 +23,7 @@ export default function Dos() {
 
   return (
     <div className="modes">
+      <h1 style={{marginBottom:"2rem"}}>Penetration Testing</h1>
       <h3>DoS Attack</h3>
       <form onSubmit={fetchDOS}>
         <label>

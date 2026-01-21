@@ -12,7 +12,8 @@ export default function Connect(){
         try {
             setConnection("trying to connect")
           const res = await axios.get(`http://localhost:4000/api/connect/${macAddress}`);
-          setConnection(res.data.output);
+          console.log(res)
+          setConnection(res.data);
         } catch (error) {
           console.error('Error:', error.message);
         }

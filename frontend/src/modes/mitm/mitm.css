@@ -1,0 +1,211 @@
+.mitm-page {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.mitm_child {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mitm_child h4 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+.mitm-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.mitm-warning p {
+    margin: 0;
+    color: #856404;
+    font-weight: 500;
+}
+
+.mitm-form {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.submit-btn, .stop-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.stop-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+.stop-btn:hover {
+    background-color: #e67e22;
+    transform: translateY(-2px);
+}
+
+.output-section {
+    margin-top: 2rem;
+}
+
+.output-section h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.terminal-output {
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 200px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.output-line {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-bottom: 2px;
+}
+
+.terminal-output pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Responsive design */
+.recording-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.record-btn, .stop-record-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.record-btn {
+    background-color: #ff4444;
+    color: white;
+}
+
+.stop-record-btn {
+    background-color: #666;
+    color: white;
+}
+
+.audio-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.audio-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.audio-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .mitm_child {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .submit-btn, .stop-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}

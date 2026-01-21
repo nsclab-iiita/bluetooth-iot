@@ -1,54 +1,71 @@
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { updateForm } from "../../redux/actions";
 import { useState } from "react";
 
 export default function Osversion() {
-  const form = useSelector((state) => state.form);
-  const dispatch = useDispatch();
+  // All scan results are now in local state
+  const [osVersion, setOsVersion] = useState("");
   const [cve, setCve] = useState([]);
-  const [maxresp , setMaxresp] = useState("");
-  const[respperc , setRespperc] = useState("");
-  const [meandiff , setMeandiff] = useState("");
+  
+  // State for loading and error UI feedback
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchOSversion = async (event) => {
     event.preventDefault();
     const macAddress = event.target.elements.macAddress.value;
+
+    // Reset state before new request
+    setIsLoading(true);
+    setError(null);
+    setOsVersion(""); // Reset local state for OS version
+    setCve([]);
+    
     try {
-      
       const res = await axios.get(`http://localhost:4000/api/osversion/${macAddress}`);
-      console.log(res);
-
-      dispatch(updateForm('OsVersion', res.data.os_version));
-      setMaxresp(res.data.max_response);
-      setRespperc(res.data.response_perc);
-      setMeandiff(res.data.mean_difference);
-
+      
+      // Update local state with data from the API
+      setOsVersion(res.data.os_version);
       setCve(res.data.cve_list);
-    } catch (error) {
-      console.error('Error:', error.message);
+
+    } catch (err) {
+      console.error('Error fetching OS version:', err);
+      setError('Failed to retrieve data. Please check the MAC address and ensure the server is running.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="modes">
-      <h3>Operating System Version</h3>
+      <h3>Operating System & Vulnerability Scan</h3>
       <form onSubmit={fetchOSversion}>
         <label>
-          MAC Address:
+          Bluetooth MAC Address:
           <input
             type="text"
             name="macAddress"
+            placeholder="e.g., 00:11:22:33:FF:EE"
+            required
           />
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Scanning...' : 'Start Scan'}
+        </button>
       </form>
+
       <div id="datadiv">
-        {form.OsVersion ? (
+        {isLoading && <p>Scanning... This may take up to a minute.</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        
+        {/* This now checks the local osVersion state */}
+        {osVersion && !isLoading && (
           <>
-            <p>{form.OsVersion}</p>
+            <h4>Scan Results:</h4>
+            {/* This now displays the local osVersion state */}
+            <p><strong>Estimated OS Version:</strong> {osVersion}</p>
+            
             <div>
-              <h6>CVEs:</h6>
+              <h5>Top 3 Recent CVEs:</h5>
               {cve.length > 0 ? (
                 <ul>
                   {cve.map((cveId, index) => (
@@ -60,15 +77,10 @@ export default function Osversion() {
                   ))}
                 </ul>
               ) : (
-                <p>CVEs not retrieved yet</p>
+                <p>No relevant CVEs found for this version.</p>
               )}
             </div>
-            <div>Maximum response time (in ms) :{maxresp}</div>
-            <div>Response Persentage :{respperc}</div>
-            <div>Mean RSSI difference :{meandiff}</div>
           </>
-        ) : (
-          <p>Details not found yet</p>
         )}
       </div>
     </div>
