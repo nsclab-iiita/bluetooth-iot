@@ -1,2 +1,5 @@
-[+] Sending packet to 7C:B0:73:FE:D3:B2. Packet size: 600.
-[+] Sending packet to 7C:B0:73:FE:D3:B2. Packet size: 600.
+[+] Connected to F8:EF:5D:E7:4D:8F, flooding 1000 echo packets of 150 bytes...
+....................
+[+] Flood complete: 1000 packets sent, 0 errors
+[*] Running: sudo /home/iot-lab/Desktop/bluetoothgui/backend/routes/pythonfiles/mini_l2ping F8:EF:5D:E7:4D:8F 150 1000
+[+] mini_l2ping completed successfully.

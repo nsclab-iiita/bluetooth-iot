@@ -17,6 +17,10 @@ const connectionRoute = require("./routes/connection");
 const disconnectionRoute = require("./routes/disconnection");
 const rttRoute = require("./routes/rtt");
 const responsepercentageRoute = require("./routes/reponsepercentage");
+const sendFileRoute = require("./routes/send_file")
+const firmwareRoute = require("./routes/firmware");
+const bluetoothRoute = require("./routes/bluebutton.js");
+const mitmRoute = require("./routes/mitm");
 
 mongoose.connect('mongodb://localhost:27017/Bluetoothiot', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -63,6 +67,10 @@ app.use("/api/connect",connectionRoute);
 app.use("/api/disconnect",disconnectionRoute);
 app.use("/api/rtt",rttRoute);
 app.use("/api/responsepercentage",responsepercentageRoute);
+app.use("/api/sendfile", sendFileRoute)
+app.use("/api/firmware", firmwareRoute)
+app.use("/api/bluetooth", bluetoothRoute);
+app.use("/api/mitm", mitmRoute);
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');
