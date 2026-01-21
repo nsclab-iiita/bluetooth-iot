@@ -1,0 +1,13 @@
+.disclaimer-box {
+    position: absolute;
+    top: 200px;
+    right: 20px;
+    width: 300px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-size: 14px;
+    z-index: 999;
+  }
+  
