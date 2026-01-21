@@ -5,7 +5,10 @@ const Scaninstant = require("../models/Scaninstant")
 
 router.get('/', (req, res) => {
     const pythonScriptPath = __dirname + '/pythonfiles/devicescan.py';
+    console.log(pythonScriptPath)
+
       const pythonProcess = spawn('python3', [pythonScriptPath]);
+
     
       let output = [];
       let errorOutput = '';

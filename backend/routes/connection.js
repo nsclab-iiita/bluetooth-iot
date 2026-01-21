@@ -1,4 +1,3 @@
-const fs = require('fs');
 const router = require("express").Router();
 const { spawn } = require('child_process');
 
@@ -10,34 +9,31 @@ router.get('/:macAddress', async (req, res) => {
 
     // Spawn the Python process with the MAC address as an argument
     const pythonProcess = spawn('python3', [pythonScriptPath, macAddress]);
-    const outStream = fs.createWriteStream('os.txt');
-    pythonProcess.stdout.pipe(outStream);
     let output = '';
-    
-    pythonProcess.on('close', (code) => {
-      if (code !== 0) {
-        console.error('Getting details process exited with code:', code);
-        res.status(500).json({ error: 'Internal server error' });
-      } else {
-        // Send the output string as is
-        // res.json({ output });
-        fs.readFile('os.txt', 'utf8', (err, data) => {
-          if (err) {
-              console.error('Error reading the file:', err);
-              return;
-          }
-         
-          const lines = data.trim().split('\n');
-          output = lines[lines.length - 1];
-         
-          console.log('Last line:', output);
-          res.json({ output });
-        });
-      }
+
+    // Listen to stdout data from the Python process
+    pythonProcess.stdout.on('data', (data) => {
+        output += data.toString();
     });
+
+    // Listen to stderr data from the Python process
+    pythonProcess.stderr.on('data', (data) => {
+        console.error(`Error: ${data}`);
+        res.status(500).send(`Error: ${data.toString()}`);
+    });
+
+    // Handle process close event
+    pythonProcess.on('close', (code) => {
+        if (code === 0) {
+            res.send(`${output}`);
+        } else {
+            res.status(500).send(`Script failed with code ${code}`);
+        }
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(`Exception: ${error.message}`);
+    res.status(500).send(`Exception: ${error.message}`);
   }
 });
 

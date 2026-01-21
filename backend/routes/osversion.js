@@ -6,121 +6,93 @@ router.get('/:macAddress', async (req, res) => {
   try {
     const macAddress = req.params.macAddress;
 
-    // Path to the bash script
-    const bashScriptPath = __dirname + '/pythonfiles/final.sh';
-    const bashProcess = spawn('bash', [bashScriptPath, macAddress]);
-    const outStream = fs.createWriteStream('version.txt');
-    bashProcess.stdout.pipe(outStream);
+    // Path to the consolidated Python script
+    const pythonScriptPath = __dirname + '/pythonfiles/bluetooth_cve_scanner.py';
 
-    bashProcess.on('close', async (code) => {
+    // Check if the script file exists to prevent errors
+    if (!fs.existsSync(pythonScriptPath)) {
+      console.error('Error: Python script not found at', pythonScriptPath);
+      return res.status(500).json({ error: 'Server configuration error: script not found.' });
+    }
+
+    // Spawn the Python process
+    const pythonProcess = spawn('python3', [pythonScriptPath, macAddress]);
+
+    let scriptOutput = '';
+    let scriptError = '';
+
+    // Capture stdout from the script
+    pythonProcess.stdout.on('data', (data) => {
+      scriptOutput += data.toString();
+    });
+
+    // Capture stderr for debugging
+    pythonProcess.stderr.on('data', (data) => {
+      scriptError += data.toString();
+    });
+
+    // Handle script completion
+    pythonProcess.on('close', (code) => {
+      console.log('--- Raw Python Script Output ---');
+      console.log(scriptOutput);
+      console.log('--------------------------------');
+
       if (code !== 0) {
-        console.error('Getting details process exited with code:', code);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error(`Python script exited with code: ${code}`);
+        console.error('stderr:', scriptError);
+        return res.status(500).json({ error: 'Error executing scanner script.', details: scriptError });
       }
 
       try {
-        // Read the content of os.txt and version.txt asynchronously
-        const osContent = await fs.promises.readFile('os.txt', 'utf8');
-        console.log("os.txt content:", osContent);
+        // --- Parse Android Version ---
+        const osVersionMatch = scriptOutput.match(/Estimated Android Version: (.*?)\n/);
+        const os_version = osVersionMatch ? osVersionMatch[1].trim() : 'Unknown';
+        console.log("OS Version:", os_version);
+        
+        // --- Parse other bluetooth parameters ---
+        const meanDifferenceMatch = scriptOutput.match(/Mean_difference:\s*([0-9.]+)/);
+        const mean_difference = meanDifferenceMatch ? meanDifferenceMatch[1] : 'Unknown';
 
-        // Read version.txt
-        const versionContent = await fs.promises.readFile('version.txt', 'utf8');
-        const lines = versionContent.trim().split('\n');
+        const responsePercMatch = scriptOutput.match(/response_perc:\s*([0-9.]+)/);
+        const response_perc = responsePercMatch ? responsePercMatch[1] : 'Unknown';
 
-        // Initialize variables for the parameters
-        let mean_difference = 'Unknown';
-        let response_perc = 'Unknown';
-        let max_response = 'Unknown';
-
-        // Loop through lines in reverse to find the last occurrence of each parameter
-        for (let i = lines.length - 1; i >= 0; i--) {
-          const line = lines[i];
-
-          if (mean_difference === 'Unknown') {
-            const meanDifferenceMatch = line.match(/Mean_difference:\s*([0-9.]+)/);
-            if (meanDifferenceMatch) {
-              mean_difference = meanDifferenceMatch[1];
-            }
-          }
-
-          if (response_perc === 'Unknown') {
-            const responsePercMatch = line.match(/response_perc:\s*([0-9.]+)/);
-            if (responsePercMatch) {
-              response_perc = responsePercMatch[1];
-            }
-          }
-
-          if (max_response === 'Unknown') {
-            const maxResponseMatch = line.match(/Max_response:\s*([0-9.]+)/);
-            if (maxResponseMatch) {
-              max_response = maxResponseMatch[1];
-            }
-          }
-
-          // Break the loop if all parameters have been found
-          if (mean_difference !== 'Unknown' && response_perc !== 'Unknown' && max_response !== 'Unknown') {
-            break;
-          }
-        }
+        const maxResponseMatch = scriptOutput.match(/Max_response:\s*([0-9.]+)/);
+        const max_response = maxResponseMatch ? maxResponseMatch[1] : 'Unknown';
 
         console.log("Mean_difference:", mean_difference);
         console.log("Response_percentage:", response_perc);
         console.log("Max_response:", max_response);
 
-        // Extract the last number from the last line of version.txt for OS version
-        const numberMatch = lines[lines.length - 1].match(/\d+$/);
-        const lastNumber = numberMatch ? numberMatch[0] : 'Unknown';
-        let os_version = `${osContent.trim()} ${lastNumber}`.replace(/\s+/g, ' ').trim();
-        console.log("OS Version:", os_version);
-
-        // Path to the Python script for CVE scanning
-        const cveScriptPath = __dirname + '/pythonfiles/cv_scanner.py';
+        // --- Parse Top 3 CVEs ---
+        let cveList = [];
+        const cveSection = scriptOutput.split('--- CVE Scan Results ---')[1];
         
-        // Spawn the Python process for CVE scanning with the OS version as an argument
-        const cveProcess = spawn('python3', [cveScriptPath, os_version]);
-        let cveOutput = '';
+        if (cveSection && !cveSection.includes("No relevant CVE entries found")) {
+            const cveLines = cveSection.trim().split('\n');
+            cveList = cveLines
+              .map(line => line.split(' ')[0]) // Get the first part, e.g., 'CVE-2023-12345'
+              .filter(cve => cve.startsWith('CVE-')); // Ensure it's a valid CVE ID format
+        }
+        
+        console.log("CVE List:", cveList);
 
-        cveProcess.stdout.on('data', (data) => {
-          console.log("CVE script output data received");
-          cveOutput += data.toString();
-        });
-
-        cveProcess.on('close', (code) => {
-          console.log("CVE process closed with code:", code);
-          
-          if (code !== 0) {
-            console.error('CVE scanner process exited with code:', code);
-            return res.status(500).json({ error: 'Internal server error' });
-          }
-
-          // Parse the output from the CVE scanner
-          console.log("Parsing CVE output");
-          const cveLines = cveOutput.trim().split('\n').slice(0, 5);
-          const cveList = cveLines.map(line => {
-            const cveId = line.replace(/\.json$/, '').replace(/\s+/g, ' ').trim();
-            return cveId;
-          });
-
-          console.log("CVE List:", cveList);
-
-          // Return the OS version, CVE list, and extracted parameters as a JSON response
-          console.log("Returning response");
-          return res.json({ 
-            os_version, 
-            cve_list: cveList,
-            mean_difference,
-            response_perc,
-            max_response 
-          });
+        // Return the final JSON response to the frontend
+        return res.json({
+          os_version,
+          cve_list: cveList,
+          mean_difference,
+          response_perc,
+          max_response
         });
 
       } catch (err) {
-        console.error('Error reading files:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('Error parsing script output:', err);
+        return res.status(500).json({ error: 'Internal server error while parsing script output.' });
       }
     });
+
   } catch (error) {
-    console.error("Caught exception:", error);
+    console.error("Caught exception in endpoint handler:", error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

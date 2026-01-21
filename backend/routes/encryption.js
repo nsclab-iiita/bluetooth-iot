@@ -5,7 +5,7 @@ router.get('/:macAddress', async (req, res) => {
   try {
     const macAddress = req.params.macAddress;
 
-    const pythonScriptPath = __dirname + '/pythonfiles/encryption.py';
+    const pythonScriptPath = __dirname + '/pythonfiles/encryption_custom.py';
 
     // Spawn the Python process with the MAC address as an argument
     const pythonProcess = spawn('python3', [pythonScriptPath, macAddress]);
