@@ -1,0 +1,20 @@
+{
+    "_comment": "Bluetooth MITM Attack Configuration File",
+    "_instructions": "Fill in the MAC addresses below with your actual device addresses",
+    "victim_earbuds_mac": "BB:C9:6C:47:57:EB",
+    "victim_phone_mac": "7C:F0:E5:89:66:7A",
+    "original_spoof_adapter_mac": "48:D8:45:8E:07:A1",
+    "connecting_adapter_mac": "B0:3C:DC:A0:26:CE",
+    "fake_earbuds_name": "Noise Buds N1 Pro",
+    "original_adapter_name": "Orico Bluetooth Adapter",
+    "recording_file": "captured_audio.wav",
+    "_notes": [
+        "earbuds_mac: MAC address of the target earbuds you want to impersonate",
+        "phone_mac: MAC address of the victim's phone",
+        "original_adapter_mac: Original MAC of your Bluetooth adapter before spoofing",
+        "spoofing_adapter: Bluetooth adapter used for spoofing (usually hci1 or hci2)",
+        "connecting_adapter: Bluetooth adapter used to connect to real earbuds (usually hci0)",
+        "fake_earbuds_name: Name that will appear to the victim's phone",
+        "original_adapter_name: Original name of your Bluetooth adapter"
+    ]
+}
